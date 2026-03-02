@@ -31,6 +31,9 @@ export const mockCase1: Case = {
   safetyNotes: "電線に注意。風速5m/s以上は中止。",
   pricing: {
     baseAmount: 80000,
+    equipmentFee: 0,
+    applicationFee: 30000,
+    dataReportFee: 5000,
     travelFee: 15000,
     optionAmount: 0,
     discount: 0,
@@ -69,6 +72,9 @@ export const mockCase2: Case = {
   safetyNotes: "送電線が近接するエリアあり。",
   pricing: {
     baseAmount: 120000,
+    equipmentFee: 20000,
+    applicationFee: 0,
+    dataReportFee: 20000,
     travelFee: 25000,
     optionAmount: 20000,
     discount: 5000,

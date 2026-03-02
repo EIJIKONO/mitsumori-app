@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Case } from "@/lib/types";
 import { BUSINESS_TYPE_LABELS } from "@/lib/types";
-import { getPricingSummary } from "@/lib/calc/pricing";
+import { getPricingSummary, getPricingLineItems } from "@/lib/calc/pricing";
 import { buildEstimateText } from "@/lib/templates";
 import { formatDateJa } from "@/lib/templates/format";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ interface EstimateViewProps {
 export function EstimateView({ caseData }: EstimateViewProps) {
   const [copied, setCopied] = useState(false);
   const summary = getPricingSummary(caseData.pricing);
+  const lineItems = getPricingLineItems(caseData.pricing);
   const businessLabel = BUSINESS_TYPE_LABELS[caseData.businessType];
   const issueDate = formatDateJa(
     caseData.updatedAt?.slice(0, 10) ?? caseData.createdAt?.slice(0, 10)
@@ -79,36 +80,17 @@ export function EstimateView({ caseData }: EstimateViewProps) {
           <p className="mb-2 font-medium">【金額明細】</p>
           <table className="w-full max-w-md">
             <tbody>
-              <tr>
-                <td className="py-1">基本料金（税抜）</td>
-                <td className="text-right">
-                  ¥{(caseData.pricing.baseAmount ?? 0).toLocaleString()}
-                </td>
-              </tr>
-              {(caseData.pricing.travelFee ?? 0) > 0 && (
-                <tr>
-                  <td className="py-1">出張費（税抜）</td>
-                  <td className="text-right">
-                    ¥{(caseData.pricing.travelFee ?? 0).toLocaleString()}
-                  </td>
-                </tr>
-              )}
-              {(caseData.pricing.optionAmount ?? 0) > 0 && (
-                <tr>
-                  <td className="py-1">オプション（税抜）</td>
-                  <td className="text-right">
-                    ¥{(caseData.pricing.optionAmount ?? 0).toLocaleString()}
-                  </td>
-                </tr>
-              )}
-              {(caseData.pricing.discount ?? 0) > 0 && (
-                <tr>
-                  <td className="py-1">値引き（税抜）</td>
-                  <td className="text-right">
-                    -¥{(caseData.pricing.discount ?? 0).toLocaleString()}
-                  </td>
-                </tr>
-              )}
+              {lineItems
+                .filter((item) => item.amount !== 0)
+                .map((item) => (
+                  <tr key={item.key}>
+                    <td className="py-1">{item.label}</td>
+                    <td className="text-right">
+                      {item.amount < 0 ? "-" : ""}¥
+                      {Math.abs(item.amount).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
               <tr className="border-t">
                 <td className="py-1">税抜小計</td>
                 <td className="text-right">

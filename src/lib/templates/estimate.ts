@@ -1,11 +1,12 @@
 import type { Case } from "@/lib/types";
 import { BUSINESS_TYPE_LABELS } from "@/lib/types";
-import { getPricingSummary } from "@/lib/calc/pricing";
+import { getPricingSummary, getPricingLineItems } from "@/lib/calc/pricing";
 import { formatDateJa } from "./format";
 
 /** 見積書のプレーンテキスト（コピー用） */
 export function buildEstimateText(c: Case): string {
   const summary = getPricingSummary(c.pricing);
+  const lineItems = getPricingLineItems(c.pricing);
   const businessLabel = BUSINESS_TYPE_LABELS[c.businessType];
   const issueDate = formatDateJa(c.updatedAt?.slice(0, 10) ?? undefined);
 
@@ -24,16 +25,12 @@ export function buildEstimateText(c: Case): string {
     c.memo ? `　備考：${c.memo}` : "",
     "",
     "【金額明細】",
-    `　基本料金（税抜）　　　　¥${(c.pricing.baseAmount ?? 0).toLocaleString()}`,
-    (c.pricing.travelFee ?? 0) > 0
-      ? `　出張費（税抜）　　　　　¥${(c.pricing.travelFee ?? 0).toLocaleString()}`
-      : "",
-    (c.pricing.optionAmount ?? 0) > 0
-      ? `　オプション（税抜）　　　¥${(c.pricing.optionAmount ?? 0).toLocaleString()}`
-      : "",
-    (c.pricing.discount ?? 0) > 0
-      ? `　値引き（税抜）　　　　-¥${(c.pricing.discount ?? 0).toLocaleString()}`
-      : "",
+    ...lineItems
+      .filter((item) => item.amount !== 0)
+      .map(
+        (item) =>
+          `　${item.label}　${item.amount < 0 ? "-" : ""}¥${Math.abs(item.amount).toLocaleString()}`
+      ),
     `　────────────────────`,
     `　税抜小計　　　　　　　　¥${summary.subtotal.toLocaleString()}`,
     `　消費税（${(summary.taxRate * 100).toFixed(0)}%）　　　　　¥${summary.taxAmount.toLocaleString()}`,

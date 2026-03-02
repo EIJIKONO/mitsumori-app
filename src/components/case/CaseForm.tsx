@@ -65,6 +65,7 @@ export function CaseForm({
             onChange={(pricing) =>
               setCaseData((prev) => ({ ...prev, pricing }))
             }
+            businessType={caseData.businessType}
           />
         </TabsContent>
       </Tabs>

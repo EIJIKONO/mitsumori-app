@@ -8,6 +8,10 @@ export type { Customer } from "./customer";
 export { emptyCustomer } from "./customer";
 
 export type { Pricing } from "./pricing";
-export { emptyPricing, DEFAULT_TAX_RATE } from "./pricing";
+export {
+  emptyPricing,
+  DEFAULT_TAX_RATE,
+  PRICING_LINE_ITEM_LABELS,
+} from "./pricing";
 
 export type { Case } from "./case";

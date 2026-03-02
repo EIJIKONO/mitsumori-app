@@ -1,13 +1,43 @@
 import type { Pricing } from "@/lib/types";
-import { DEFAULT_TAX_RATE } from "@/lib/types";
+import { DEFAULT_TAX_RATE, PRICING_LINE_ITEM_LABELS } from "@/lib/types";
 
-/** 税抜小計（基本＋出張＋オプション－値引き） */
+const LINE_ITEM_KEYS: (keyof Pick<
+  Pricing,
+  | "baseAmount"
+  | "equipmentFee"
+  | "applicationFee"
+  | "dataReportFee"
+  | "travelFee"
+  | "optionAmount"
+  | "discount"
+>)[] = [
+  "baseAmount",
+  "equipmentFee",
+  "applicationFee",
+  "dataReportFee",
+  "travelFee",
+  "optionAmount",
+  "discount",
+];
+
+/** 税抜小計（全内訳の合計。値引きは減算） */
 export function getSubtotal(p: Pricing): number {
-  const base = p.baseAmount ?? 0;
-  const travel = p.travelFee ?? 0;
-  const option = p.optionAmount ?? 0;
-  const discount = p.discount ?? 0;
-  return Math.max(0, base + travel + option - discount);
+  let sum = 0;
+  for (const key of LINE_ITEM_KEYS) {
+    const v = p[key];
+    if (v == null) continue;
+    sum += key === "discount" ? -Number(v) : Number(v);
+  }
+  return Math.max(0, sum);
+}
+
+/** 内訳一覧（表示・見積用。0円の項目も含む） */
+export function getPricingLineItems(p: Pricing): { key: typeof LINE_ITEM_KEYS[number]; label: string; amount: number }[] {
+  return LINE_ITEM_KEYS.map((key) => ({
+    key,
+    label: PRICING_LINE_ITEM_LABELS[key],
+    amount: key === "discount" ? -(p[key] ?? 0) : (p[key] ?? 0),
+  }));
 }
 
 /** 消費税率（0〜1） */
