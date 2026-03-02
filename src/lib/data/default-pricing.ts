@@ -78,9 +78,57 @@ export const DEFAULT_PRICING_BY_BUSINESS_TYPE: Record<
   },
 };
 
+const STORAGE_KEY = "mitsumori-app-pricing-presets";
+
+type PricingPresetMap = Partial<Record<BusinessType, Partial<Pricing>>>;
+
+function isClient(): boolean {
+  return typeof window !== "undefined";
+}
+
+function getOverrides(): PricingPresetMap {
+  if (!isClient()) return {};
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as unknown;
+    if (!parsed || typeof parsed !== "object") return {};
+    return parsed as PricingPresetMap;
+  } catch {
+    return {};
+  }
+}
+
+function saveOverrides(map: PricingPresetMap): void {
+  if (!isClient()) return;
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+  } catch {
+    // ignore
+  }
+}
+
 /** 指定した業務種別の目安料金を返す（既存の pricing にマージして使う） */
 export function getDefaultPricingForBusinessType(
   businessType: BusinessType
 ): Partial<Pricing> {
-  return { ...DEFAULT_PRICING_BY_BUSINESS_TYPE[businessType] };
+  const overrides = getOverrides();
+  const base = DEFAULT_PRICING_BY_BUSINESS_TYPE[businessType] ?? {};
+  const override = overrides[businessType] ?? {};
+  return { ...base, ...override };
 }
+
+/** 現在の料金を業務種別の目安として保存（「こちら側で調整」用） */
+export function saveDefaultPricingForBusinessType(
+  businessType: BusinessType,
+  pricing: Partial<Pricing>
+): void {
+  if (!isClient()) return;
+  const overrides = getOverrides();
+  overrides[businessType] = {
+    ...(overrides[businessType] ?? {}),
+    ...pricing,
+  };
+  saveOverrides(overrides);
+}
+

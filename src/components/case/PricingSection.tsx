@@ -4,7 +4,10 @@ import type { Pricing } from "@/lib/types";
 import type { BusinessType } from "@/lib/types/business-type";
 import { PRICING_LINE_ITEM_LABELS } from "@/lib/types";
 import { getPricingSummary } from "@/lib/calc/pricing";
-import { getDefaultPricingForBusinessType } from "@/lib/data/default-pricing";
+import {
+  getDefaultPricingForBusinessType,
+  saveDefaultPricingForBusinessType,
+} from "@/lib/data/default-pricing";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -45,26 +48,44 @@ export function PricingSection({
     onChange({ ...pricing, ...defaults });
   };
 
+  const handleSaveAsDefault = () => {
+    if (!businessType) return;
+    saveDefaultPricingForBusinessType(businessType, pricing);
+    window.alert("現在の金額をこの業務種別の目安として保存しました。");
+  };
+
   return (
     <Card>
       <CardHeader>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle className="text-base">料金</CardTitle>
-          {businessType && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleApplyDefault}
-            >
-              目安を反映
-            </Button>
-          )}
+          <div className="flex flex-wrap gap-2">
+            {businessType && (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleApplyDefault}
+                >
+                  目安を反映
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSaveAsDefault}
+                >
+                  現在の金額を目安として保存
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-xs text-muted-foreground">
-          「目安を反映」で選択中の業務種別の相場を料金に反映します。
+          「目安を反映」は業務種別ごとの目安料金を反映します。「現在の金額を目安として保存」で、この案件の設定を今後の目安として保存できます（ブラウザごとに保存）。
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
           {LINE_ITEM_KEYS.map((key) => (
