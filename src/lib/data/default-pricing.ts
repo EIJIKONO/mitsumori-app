@@ -132,3 +132,13 @@ export function saveDefaultPricingForBusinessType(
   saveOverrides(overrides);
 }
 
+/** 指定した業務種別の目安を初期値に戻す */
+export function clearPresetForBusinessType(
+  businessType: BusinessType
+): void {
+  if (!isClient()) return;
+  const overrides = getOverrides();
+  delete overrides[businessType];
+  saveOverrides(overrides);
+}
+

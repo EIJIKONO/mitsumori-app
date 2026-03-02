@@ -21,6 +21,8 @@ export interface Pricing {
   taxRate?: number;
   /** 料金備考 */
   note?: string;
+  /** 追加項目（自由に項目名・金額を追加） */
+  customItems?: { id: string; label: string; amount: number }[];
 }
 
 export const DEFAULT_TAX_RATE = 0.1;
@@ -58,4 +60,5 @@ export const emptyPricing: Pricing = {
   discount: 0,
   taxRate: DEFAULT_TAX_RATE,
   note: "",
+  customItems: [],
 };

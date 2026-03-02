@@ -20,7 +20,7 @@ const LINE_ITEM_KEYS: (keyof Pick<
   "discount",
 ];
 
-/** 税抜小計（全内訳の合計。値引きは減算） */
+/** 税抜小計（固定項目＋追加項目。値引きは減算） */
 export function getSubtotal(p: Pricing): number {
   let sum = 0;
   for (const key of LINE_ITEM_KEYS) {
@@ -28,16 +28,27 @@ export function getSubtotal(p: Pricing): number {
     if (v == null) continue;
     sum += key === "discount" ? -Number(v) : Number(v);
   }
-  return Math.max(0, sum);
+  const custom = (p.customItems ?? []).reduce((a, i) => a + (i.amount ?? 0), 0);
+  return Math.max(0, sum + custom);
 }
 
-/** 内訳一覧（表示・見積用。0円の項目も含む） */
-export function getPricingLineItems(p: Pricing): { key: typeof LINE_ITEM_KEYS[number]; label: string; amount: number }[] {
-  return LINE_ITEM_KEYS.map((key) => ({
+export type PricingLineItem =
+  | { key: (typeof LINE_ITEM_KEYS)[number]; label: string; amount: number }
+  | { key: string; label: string; amount: number };
+
+/** 内訳一覧（固定項目＋追加項目。表示・見積用） */
+export function getPricingLineItems(p: Pricing): PricingLineItem[] {
+  const fixed: PricingLineItem[] = LINE_ITEM_KEYS.map((key) => ({
     key,
     label: PRICING_LINE_ITEM_LABELS[key],
     amount: key === "discount" ? -(p[key] ?? 0) : (p[key] ?? 0),
   }));
+  const custom = (p.customItems ?? []).map((i) => ({
+    key: `custom-${i.id}`,
+    label: i.label || "（項目名未入力）",
+    amount: i.amount ?? 0,
+  }));
+  return [...fixed, ...custom];
 }
 
 /** 消費税率（0〜1） */
