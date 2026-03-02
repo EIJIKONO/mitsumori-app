@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 240 10% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 10%;
+    --primary: 220 70% 45%;
+    --primary-foreground: 0 0% 100%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 240 4% 46%;
+    --border: 220 13% 91%;
+    --ring: 220 70% 45%;
+    --radius: 0.5rem;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 10%;
+  }
+  .dark {
+    --background: 240 10% 6%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 8%;
+    --card-foreground: 0 0% 98%;
+    --primary: 220 70% 55%;
+    --primary-foreground: 0 0% 100%;
+    --muted: 240 4% 16%;
+    --muted-foreground: 240 5% 65%;
+    --border: 240 4% 16%;
+    --ring: 220 70% 55%;
+    --popover: 240 10% 8%;
+    --popover-foreground: 0 0% 98%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-background text-foreground antialiased min-h-screen;
+  }
+}
+
+/* 印刷用：見積書など */
+.no-print {
+  @media print {
+    display: none !important;
+  }
+}
+
+@media print {
+  body {
+    @apply bg-white text-black;
+  }
+  /* 見積書タブの内容のみ印刷（他要素は非表示） */
+  body * {
+    visibility: hidden;
+  }
+  #estimate-print-area,
+  #estimate-print-area * {
+    visibility: visible;
+  }
+  #estimate-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-width: none;
+    box-shadow: none;
+    border: none;
+    padding: 1rem;
+    font-size: 12pt;
+  }
+  #estimate-print-area table {
+    page-break-inside: avoid;
+  }
+}
