@@ -17,6 +17,12 @@ export function Header() {
           >
             案件一覧
           </Link>
+          <Link
+            href="/settings/pricing"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            目安料金
+          </Link>
         </nav>
       </div>
     </header>

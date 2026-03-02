@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import type { Pricing } from "@/lib/types";
 import type { BusinessType } from "@/lib/types/business-type";
 import { PRICING_LINE_ITEM_LABELS, BUSINESS_TYPE_OPTIONS } from "@/lib/types";
@@ -146,7 +147,14 @@ export function PricingSection({
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-xs text-muted-foreground">
-          「目安を反映」は業務種別ごとの目安料金を反映します。「現在の金額を目安として保存」で、この案件の設定を今後の目安として保存できます（ブラウザごとに保存）。
+          「目安を反映」は業務種別ごとの目安料金を反映します。「現在の金額を目安として保存」で、この案件の設定を今後の目安として保存できます。
+          <Link
+            href="/settings/pricing"
+            className="ml-1 text-primary underline hover:no-underline"
+          >
+            目安の金額は別画面で設定
+          </Link>
+          （ブラウザに保存）
         </p>
 
         {/* 目安を編集（別枠で変更しやすいUI） */}
